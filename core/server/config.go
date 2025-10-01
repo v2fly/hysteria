@@ -2,16 +2,17 @@ package server
 
 import (
 	"crypto/tls"
-	"github.com/apernet/quic-go/http3"
 	"net"
 	"net/http"
 	"sync/atomic"
 	"time"
 
+	"github.com/apernet/quic-go/http3"
+
+	"github.com/apernet/quic-go"
 	"github.com/v2fly/hysteria/core/v2/errors"
 	"github.com/v2fly/hysteria/core/v2/international/pmtud"
 	"github.com/v2fly/hysteria/core/v2/international/utils"
-	"github.com/apernet/quic-go"
 )
 
 const (
@@ -37,7 +38,7 @@ type Config struct {
 	TrafficLogger         TrafficLogger
 	MasqHandler           http.Handler
 
-	StreamHijacker     func(http3.FrameType, quic.Connection, quic.Stream, error) (hijacked bool, err error)
+	StreamHijacker     func(http3.FrameType, *quic.Conn, *utils.QStream, error) (hijacked bool, err error)
 	UdpSessionHijacker func(*UdpSessionEntry, string)
 }
 
@@ -127,7 +128,7 @@ type QUICConfig struct {
 // of a UDP connection. It also cannot put back any data as the first packet is always sent as-is.
 type RequestHook interface {
 	Check(isUDP bool, reqAddr string) bool
-	TCP(stream quic.Stream, reqAddr *string) ([]byte, error)
+	TCP(stream *utils.QStream, reqAddr *string) ([]byte, error)
 	UDP(data []byte, reqAddr *string) error
 }
 
@@ -218,8 +219,8 @@ type EventLogger interface {
 type TrafficLogger interface {
 	LogTraffic(id string, tx, rx uint64) (ok bool)
 	LogOnlineState(id string, online bool)
-	TraceStream(stream quic.Stream, stats *StreamStats)
-	UntraceStream(stream quic.Stream)
+	TraceStream(stream *utils.QStream, stats *StreamStats)
+	UntraceStream(stream *utils.QStream)
 }
 
 type StreamState int

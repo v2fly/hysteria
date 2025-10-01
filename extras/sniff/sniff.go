@@ -88,7 +88,7 @@ func (h *Sniffer) Check(isUDP bool, reqAddr string) bool {
 	}
 }
 
-func (h *Sniffer) TCP(stream quic.Stream, reqAddr *string) ([]byte, error) {
+func (h *Sniffer) TCP(stream *utils.QStream, reqAddr *string) ([]byte, error) {
 	var err error
 	if h.Timeout == 0 {
 		err = stream.SetReadDeadline(time.Now().Add(sniffDefaultTimeout))
@@ -174,7 +174,7 @@ func (h *Sniffer) UDP(data []byte, reqAddr *string) error {
 }
 
 type teeReader struct {
-	Stream quic.Stream
+	Stream *utils.QStream
 	Pre    []byte
 
 	buf []byte

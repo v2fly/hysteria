@@ -26,8 +26,8 @@ type Client interface {
 	TCP(addr string) (net.Conn, error)
 	UDP() (HyUDPConn, error)
 	Close() error
-	OpenStream() (quic.Stream, error)
-	GetQuicConn() quic.Connection
+	OpenStream() (*utils.QStream, error)
+	GetQuicConn() *quic.Conn
 }
 
 type HyUDPConn interface {
@@ -59,7 +59,7 @@ type clientImpl struct {
 	config *Config
 
 	pktConn net.PacketConn
-	conn    quic.Connection
+	conn    *quic.Conn
 
 	udpSM *udpSessionManager
 }
@@ -87,11 +87,11 @@ func (c *clientImpl) connect() (*HandshakeInfo, error) {
 		EnableDatagrams:                true,
 	}
 	// Prepare RoundTripper
-	var conn quic.EarlyConnection
-	rt := &http3.RoundTripper{
+	var conn *quic.Conn
+	rt := &http3.Transport{
 		TLSClientConfig: tlsConfig,
 		QUICConfig:      quicConfig,
-		Dial: func(ctx context.Context, _ string, tlsCfg *tls.Config, cfg *quic.Config) (quic.EarlyConnection, error) {
+		Dial: func(ctx context.Context, _ string, tlsCfg *tls.Config, cfg *quic.Config) (*quic.Conn, error) {
 			qc, err := quic.DialEarly(ctx, pktConn, c.config.ServerAddr, tlsCfg, cfg)
 			if err != nil {
 				return nil, err
@@ -162,7 +162,7 @@ func (c *clientImpl) connect() (*HandshakeInfo, error) {
 }
 
 // OpenStream wraps the stream with QStream, which handles Close() properly
-func (c *clientImpl) OpenStream() (quic.Stream, error) {
+func (c *clientImpl) OpenStream() (*utils.QStream, error) {
 	stream, err := c.conn.OpenStream()
 	if err != nil {
 		return nil, err
@@ -170,7 +170,7 @@ func (c *clientImpl) OpenStream() (quic.Stream, error) {
 	return &utils.QStream{Stream: stream}, nil
 }
 
-func (c *clientImpl) GetQuicConn() quic.Connection {
+func (c *clientImpl) GetQuicConn() *quic.Conn {
 	return c.conn
 }
 
@@ -242,7 +242,7 @@ func wrapIfConnectionClosed(err error) error {
 }
 
 type tcpConn struct {
-	Orig             quic.Stream
+	Orig             *utils.QStream
 	PseudoLocalAddr  net.Addr
 	PseudoRemoteAddr net.Addr
 	Established      bool
@@ -292,7 +292,7 @@ func (c *tcpConn) SetWriteDeadline(t time.Time) error {
 }
 
 type udpIOImpl struct {
-	Conn quic.Connection
+	Conn *quic.Conn
 }
 
 func (io *udpIOImpl) ReceiveMessage() (*protocol.UDPMessage, error) {
