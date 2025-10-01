@@ -105,7 +105,7 @@ func (_c *MockTrafficLogger_LogTraffic_Call) RunAndReturn(run func(string, uint6
 }
 
 // TraceStream provides a mock function with given fields: stream, stats
-func (_m *MockTrafficLogger) TraceStream(stream quic.Stream, stats *server.StreamStats) {
+func (_m *MockTrafficLogger) TraceStream(stream *utils.QStream, stats *server.StreamStats) {
 	_m.Called(stream, stats)
 }
 
@@ -115,15 +115,15 @@ type MockTrafficLogger_TraceStream_Call struct {
 }
 
 // TraceStream is a helper method to define mock.On call
-//   - stream quic.Stream
+//   - stream *utils.QStream
 //   - stats *server.StreamStats
 func (_e *MockTrafficLogger_Expecter) TraceStream(stream interface{}, stats interface{}) *MockTrafficLogger_TraceStream_Call {
 	return &MockTrafficLogger_TraceStream_Call{Call: _e.mock.On("TraceStream", stream, stats)}
 }
 
-func (_c *MockTrafficLogger_TraceStream_Call) Run(run func(stream quic.Stream, stats *server.StreamStats)) *MockTrafficLogger_TraceStream_Call {
+func (_c *MockTrafficLogger_TraceStream_Call) Run(run func(stream *utils.QStream, stats *server.StreamStats)) *MockTrafficLogger_TraceStream_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(quic.Stream), args[1].(*server.StreamStats))
+		run(args[0].(*utils.QStream), args[1].(*server.StreamStats))
 	})
 	return _c
 }
@@ -133,13 +133,13 @@ func (_c *MockTrafficLogger_TraceStream_Call) Return() *MockTrafficLogger_TraceS
 	return _c
 }
 
-func (_c *MockTrafficLogger_TraceStream_Call) RunAndReturn(run func(quic.Stream, *server.StreamStats)) *MockTrafficLogger_TraceStream_Call {
+func (_c *MockTrafficLogger_TraceStream_Call) RunAndReturn(run func(*utils.QStream, *server.StreamStats)) *MockTrafficLogger_TraceStream_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // UntraceStream provides a mock function with given fields: stream
-func (_m *MockTrafficLogger) UntraceStream(stream quic.Stream) {
+func (_m *MockTrafficLogger) UntraceStream(stream *utils.QStream) {
 	_m.Called(stream)
 }
 
@@ -149,14 +149,14 @@ type MockTrafficLogger_UntraceStream_Call struct {
 }
 
 // UntraceStream is a helper method to define mock.On call
-//   - stream quic.Stream
+//   - stream *utils.QStream
 func (_e *MockTrafficLogger_Expecter) UntraceStream(stream interface{}) *MockTrafficLogger_UntraceStream_Call {
 	return &MockTrafficLogger_UntraceStream_Call{Call: _e.mock.On("UntraceStream", stream)}
 }
 
-func (_c *MockTrafficLogger_UntraceStream_Call) Run(run func(stream quic.Stream)) *MockTrafficLogger_UntraceStream_Call {
+func (_c *MockTrafficLogger_UntraceStream_Call) Run(run func(stream *utils.QStream)) *MockTrafficLogger_UntraceStream_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(quic.Stream))
+		run(args[0].(*utils.QStream))
 	})
 	return _c
 }
@@ -166,7 +166,7 @@ func (_c *MockTrafficLogger_UntraceStream_Call) Return() *MockTrafficLogger_Untr
 	return _c
 }
 
-func (_c *MockTrafficLogger_UntraceStream_Call) RunAndReturn(run func(quic.Stream)) *MockTrafficLogger_UntraceStream_Call {
+func (_c *MockTrafficLogger_UntraceStream_Call) RunAndReturn(run func(*utils.QStream)) *MockTrafficLogger_UntraceStream_Call {
 	_c.Call.Return(run)
 	return _c
 }

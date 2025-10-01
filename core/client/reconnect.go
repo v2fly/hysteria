@@ -4,8 +4,9 @@ import (
 	"net"
 	"sync"
 
-	coreErrs "github.com/v2fly/hysteria/core/v2/errors"
 	"github.com/apernet/quic-go"
+	coreErrs "github.com/v2fly/hysteria/core/v2/errors"
+	"github.com/v2fly/hysteria/core/v2/international/utils"
 )
 
 // reconnectableClientImpl is a wrapper of Client, which can reconnect when the connection is closed,
@@ -20,12 +21,12 @@ type reconnectableClientImpl struct {
 }
 
 // GetQuicConn implements Client.
-func (*reconnectableClientImpl) GetQuicConn() quic.Connection {
+func (*reconnectableClientImpl) GetQuicConn() *quic.Conn {
 	panic("unimplemented")
 }
 
 // OpenStream implements Client.
-func (*reconnectableClientImpl) OpenStream() (quic.Stream, error) {
+func (*reconnectableClientImpl) OpenStream() (*utils.QStream, error) {
 	panic("unimplemented")
 }
 

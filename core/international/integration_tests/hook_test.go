@@ -5,12 +5,12 @@ import (
 	"net"
 	"testing"
 
-	"github.com/v2fly/hysteria/core/v2/client"
-	"github.com/v2fly/hysteria/core/v2/international/integration_tests/mocks"
-	"github.com/v2fly/hysteria/core/v2/server"
 	"github.com/apernet/quic-go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/v2fly/hysteria/core/v2/client"
+	"github.com/v2fly/hysteria/core/v2/international/integration_tests/mocks"
+	"github.com/v2fly/hysteria/core/v2/server"
 )
 
 func TestClientServerHookTCP(t *testing.T) {
@@ -24,7 +24,7 @@ func TestClientServerHookTCP(t *testing.T) {
 	auth.EXPECT().Authenticate(mock.Anything, mock.Anything, mock.Anything).Return(true, "nobody")
 	hook := mocks.NewMockRequestHook(t)
 	hook.EXPECT().Check(false, fakeEchoAddr).Return(true).Once()
-	hook.EXPECT().TCP(mock.Anything, mock.Anything).RunAndReturn(func(stream quic.Stream, s *string) ([]byte, error) {
+	hook.EXPECT().TCP(mock.Anything, mock.Anything).RunAndReturn(func(stream *utils.QStream, s *string) ([]byte, error) {
 		assert.Equal(t, fakeEchoAddr, *s)
 		// Change the address
 		*s = realEchoAddr

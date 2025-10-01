@@ -31,7 +31,7 @@ func NewTrafficStatsServer(secret string) TrafficStatsServer {
 		StatsMap:  make(map[string]*trafficStatsEntry),
 		KickMap:   make(map[string]struct{}),
 		OnlineMap: make(map[string]int),
-		StreamMap: make(map[quic.Stream]*server.StreamStats),
+		StreamMap: make(map[*utils.QStream]*server.StreamStats),
 		Secret:    secret,
 	}
 }
@@ -40,7 +40,7 @@ type trafficStatsServerImpl struct {
 	Mutex     sync.RWMutex
 	StatsMap  map[string]*trafficStatsEntry
 	OnlineMap map[string]int
-	StreamMap map[quic.Stream]*server.StreamStats
+	StreamMap map[*utils.QStream]*server.StreamStats
 	KickMap   map[string]struct{}
 	Secret    string
 }
@@ -86,14 +86,14 @@ func (s *trafficStatsServerImpl) LogOnlineState(id string, online bool) {
 	}
 }
 
-func (s *trafficStatsServerImpl) TraceStream(stream quic.Stream, stats *server.StreamStats) {
+func (s *trafficStatsServerImpl) TraceStream(stream *utils.QStream, stats *server.StreamStats) {
 	s.Mutex.Lock()
 	defer s.Mutex.Unlock()
 
 	s.StreamMap[stream] = stats
 }
 
-func (s *trafficStatsServerImpl) UntraceStream(stream quic.Stream) {
+func (s *trafficStatsServerImpl) UntraceStream(stream *utils.QStream) {
 	s.Mutex.Lock()
 	defer s.Mutex.Unlock()
 
@@ -184,7 +184,7 @@ type dumpStreamEntry struct {
 	lastActiveTime time.Time
 }
 
-func (e *dumpStreamEntry) fromStreamStats(stream quic.Stream, s *server.StreamStats) {
+func (e *dumpStreamEntry) fromStreamStats(stream *utils.QStream, s *server.StreamStats) {
 	e.State = s.State.Load().String()
 	e.Auth = s.AuthID
 	e.Connection = s.ConnID

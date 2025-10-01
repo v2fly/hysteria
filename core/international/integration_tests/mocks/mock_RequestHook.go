@@ -68,7 +68,7 @@ func (_c *MockRequestHook_Check_Call) RunAndReturn(run func(bool, string) bool) 
 }
 
 // TCP provides a mock function with given fields: stream, reqAddr
-func (_m *MockRequestHook) TCP(stream quic.Stream, reqAddr *string) ([]byte, error) {
+func (_m *MockRequestHook) TCP(stream *utils.QStream, reqAddr *string) ([]byte, error) {
 	ret := _m.Called(stream, reqAddr)
 
 	if len(ret) == 0 {
@@ -77,10 +77,10 @@ func (_m *MockRequestHook) TCP(stream quic.Stream, reqAddr *string) ([]byte, err
 
 	var r0 []byte
 	var r1 error
-	if rf, ok := ret.Get(0).(func(quic.Stream, *string) ([]byte, error)); ok {
+	if rf, ok := ret.Get(0).(func(*utils.QStream, *string) ([]byte, error)); ok {
 		return rf(stream, reqAddr)
 	}
-	if rf, ok := ret.Get(0).(func(quic.Stream, *string) []byte); ok {
+	if rf, ok := ret.Get(0).(func(*utils.QStream, *string) []byte); ok {
 		r0 = rf(stream, reqAddr)
 	} else {
 		if ret.Get(0) != nil {
@@ -88,7 +88,7 @@ func (_m *MockRequestHook) TCP(stream quic.Stream, reqAddr *string) ([]byte, err
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(quic.Stream, *string) error); ok {
+	if rf, ok := ret.Get(1).(func(*utils.QStream, *string) error); ok {
 		r1 = rf(stream, reqAddr)
 	} else {
 		r1 = ret.Error(1)
@@ -103,15 +103,15 @@ type MockRequestHook_TCP_Call struct {
 }
 
 // TCP is a helper method to define mock.On call
-//   - stream quic.Stream
+//   - stream *utils.QStream
 //   - reqAddr *string
 func (_e *MockRequestHook_Expecter) TCP(stream interface{}, reqAddr interface{}) *MockRequestHook_TCP_Call {
 	return &MockRequestHook_TCP_Call{Call: _e.mock.On("TCP", stream, reqAddr)}
 }
 
-func (_c *MockRequestHook_TCP_Call) Run(run func(stream quic.Stream, reqAddr *string)) *MockRequestHook_TCP_Call {
+func (_c *MockRequestHook_TCP_Call) Run(run func(stream *utils.QStream, reqAddr *string)) *MockRequestHook_TCP_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(quic.Stream), args[1].(*string))
+		run(args[0].(*utils.QStream), args[1].(*string))
 	})
 	return _c
 }
@@ -121,7 +121,7 @@ func (_c *MockRequestHook_TCP_Call) Return(_a0 []byte, _a1 error) *MockRequestHo
 	return _c
 }
 
-func (_c *MockRequestHook_TCP_Call) RunAndReturn(run func(quic.Stream, *string) ([]byte, error)) *MockRequestHook_TCP_Call {
+func (_c *MockRequestHook_TCP_Call) RunAndReturn(run func(*utils.QStream, *string) ([]byte, error)) *MockRequestHook_TCP_Call {
 	_c.Call.Return(run)
 	return _c
 }
