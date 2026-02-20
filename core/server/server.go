@@ -214,16 +214,16 @@ func (h *h3sHandler) ProxyStreamHijacker(ft http3.FrameType, stream *quic.Stream
 
 	switch ft {
 	case protocol.FrameTypeTCPRequest:
+		// StreamDispatcher only peeks the frame type. Consume it so ReadTCPRequest
+		// starts at address length, matching pre-upgrade StreamHijacker behavior.
+		if _, err := quicvarint.Read(quicvarint.NewReader(stream)); err != nil {
+			return false, err
+		}
+		// Wraps the stream with QStream, which handles Close() properly
 		qStream := &utils.QStream{Stream: stream}
 		if h.config.StreamHijacker != nil {
 			h.config.StreamHijacker(ft, h.conn, qStream, err)
 		} else {
-			// StreamDispatcher only peeks the frame type. Consume it so ReadTCPRequest
-			// starts at address length, matching pre-upgrade StreamHijacker behavior.
-			if _, err := quicvarint.Read(quicvarint.NewReader(stream)); err != nil {
-				return false, err
-			}
-			// Wraps the stream with QStream, which handles Close() properly
 			go h.handleTCPRequest(qStream)
 		}
 		return true, nil

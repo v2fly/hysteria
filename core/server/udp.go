@@ -67,6 +67,17 @@ func newUDPSessionEntry(
 	return e
 }
 
+func (e *UdpSessionEntry) SendChFuc(p *protocol.UDPMessage) error {
+	e.connLock.Lock()
+	defer e.connLock.Unlock()
+
+	if e.closed {
+		return errors.New("session is closed")
+	}
+	e.SendCh <- p
+	return nil
+}
+
 // CloseWithErr closes the session and calls ExitFunc with the given error.
 // A nil error indicates the session is cleaned up due to timeout.
 func (e *UdpSessionEntry) CloseWithErr(err error) {
@@ -107,8 +118,14 @@ func (e *UdpSessionEntry) Feed(msg *protocol.UDPMessage) (int, error) {
 	}
 
 	if e.IsHijack {
-		e.ReceiveCh <- dfMsg
-		return len(dfMsg.Data), nil
+		e.connLock.Lock()
+		err := errors.New("session is closed")
+		if !e.closed {
+			err = nil
+			e.ReceiveCh <- dfMsg
+		}
+		e.connLock.Unlock()
+		return len(dfMsg.Data), err
 	}
 
 	if e.conn == nil {
